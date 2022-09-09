@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/viktormelin/expense-app-backend#readme",
   "dependencies": {
+    "@prisma/client": "^4.3.1",
     "express": "^4.18.1",
     "prisma": "^4.3.1"
   }
