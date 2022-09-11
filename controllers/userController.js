@@ -9,8 +9,6 @@ const registerUser = asyncHandler(async (req, res) => {
 	const { firstname, lastname, email, phone, password, confirmPassword } =
 		req.body;
 
-	console.log(req.body);
-
 	if (
 		!firstname ||
 		!lastname ||
@@ -67,6 +65,26 @@ const registerUser = asyncHandler(async (req, res) => {
 	}
 });
 
+const loginUser = asyncHandler(async (req, res) => {
+	const { email, password } = req.body;
+	const user = await prisma.user.findFirst({
+		where: { email },
+	});
+
+	if (user && (await bcrypt.compare(password, user.password))) {
+		res.status(200).json({
+			id: user.id,
+			firstname: user.firstname,
+			lastname: user.lastname,
+			email: user.email,
+			token: generateToken(user.id),
+		});
+	} else {
+		res.status(400);
+		throw new Error('Invalid credentials');
+	}
+});
+
 const generateToken = (id) => {
 	return jwt.sign({ id }, process.env.JWT_SECRET, {
 		expiresIn: process.env.JWT_EXPIRES_IN,
@@ -75,4 +93,5 @@ const generateToken = (id) => {
 
 module.exports = {
 	registerUser,
+	loginUser,
 };
