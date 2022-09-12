@@ -45,3 +45,33 @@ const createExpense = asyncHandler(async (req, res) => {
 		},
 	});
 });
+
+const handleExpensePayment = asyncHandler(async (req, res) => {
+	const { expenseId, amount } = req.body;
+	const { userId } = req.user;
+
+	if (!expenseId || !amount) {
+		res.status(400);
+		throw new Error('Please provide all required fields');
+	}
+
+	const expense = await prisma.expenses.findFirst({
+		where: {
+			id: expenseId,
+		},
+	});
+
+	expense.users.forEach(async (user) => {
+		if (user.user === userId) {
+			if (amount === user.amount) {
+				print('Hello World');
+			} else {
+				res.status(418);
+				throw new Error('Amount mismatch');
+			}
+		} else {
+			res.status(418);
+			throw new Error('User mismatch');
+		}
+	});
+});
