@@ -19,24 +19,27 @@ const fetchGroups = asyncHandler(async (req, res) => {
 });
 
 const createGroup = asyncHandler(async (req, res) => {
-	const { name, description, users } = req.body;
+	const { title, description, users } = req.body;
 	const { userId } = req.user.id;
 
-	if (!name || !description || !users) {
+	if (!title || !description || !users) {
 		res.status(400);
 		throw new Error('Please provide all required fields');
 	}
 
 	const members = [userId];
 
-	users.forEach((email) => {
-		const member = getUserFromEmail(email);
-		members.push(member);
+	users.forEach(async (email) => {
+		const member = await getUserFromEmail(email);
+		if (member) {
+			const tempObj = { member, joined: false };
+			members.push(tempObj);
+		}
 	});
 
 	const group = await prisma.groups.create({
 		data: {
-			title: name,
+			title,
 			description,
 			members,
 			owner: userId,
@@ -69,3 +72,23 @@ const deleteGroup = asyncHandler(async (req, res) => {
 		},
 	});
 });
+
+const getUserFromEmail = async (email) => {
+	const user = await prisma.users.findFirst({
+		where: {
+			email,
+		},
+	});
+
+	if (user) {
+		return user.id;
+	} else {
+		throw new Error('Could not find user');
+	}
+};
+
+module.exports = {
+	fetchGroups,
+	createGroup,
+	deleteGroup,
+};
