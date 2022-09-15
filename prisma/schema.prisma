@@ -12,6 +12,11 @@ type ExpensesUsers {
   user   String @db.ObjectId
 }
 
+type GroupMember {
+  user String @db.ObjectId
+  joined Boolean
+}
+
 model Expenses {
   id          String          @id @default(auto()) @map("_id") @db.ObjectId
   amount      Float
@@ -26,7 +31,7 @@ model Groups {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   description String
   expenses    String[] @db.ObjectId
-  members     String[] @db.ObjectId
+  members     GroupMember[]
   owner       String   @db.ObjectId
   title       String
 }
