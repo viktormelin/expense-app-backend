@@ -7,10 +7,11 @@ const {
 	createGroup,
 	deleteGroup,
 } = require('../controllers/groupController');
+const { protect } = require('../middleware/authMiddleware');
 
-router.get('/fetchall', fetchGroups);
-router.post('/fetch', fetchGroup);
-router.post('/create', createGroup);
-router.post('/delete', deleteGroup);
+router.get('/fetchall', protect, fetchGroups);
+router.post('/fetch', protect, fetchGroup);
+router.post('/create', protect, createGroup);
+router.post('/delete', protect, deleteGroup);
 
 module.exports = router;
