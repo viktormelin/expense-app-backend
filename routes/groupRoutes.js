@@ -8,7 +8,7 @@ const {
 	deleteGroup,
 } = require('../controllers/groupController');
 
-router.post('/fetchall', fetchGroups);
+router.get('/fetchall', fetchGroups);
 router.post('/fetch', fetchGroup);
 router.post('/create', createGroup);
 router.post('/delete', deleteGroup);
