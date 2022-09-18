@@ -12,11 +12,6 @@ type ExpensesUsers {
   user   String @db.ObjectId
 }
 
-// type GroupMember {
-//   user String @db.ObjectId
-//   joined Boolean
-// }
-
 model Expenses {
   id          String          @id @default(auto()) @map("_id") @db.ObjectId
   amount      Float
