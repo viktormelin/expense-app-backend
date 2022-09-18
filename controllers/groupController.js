@@ -86,6 +86,13 @@ const deleteGroup = asyncHandler(async (req, res) => {
 			AND: [{ id: groupId }, { owner: userId }],
 		},
 	});
+
+	if (deletedGroup) {
+		res.status(201);
+	} else {
+		res.status(500);
+		throw new Error('Could not delete group');
+	}
 });
 
 const getUserFromEmail = async (email) => {
