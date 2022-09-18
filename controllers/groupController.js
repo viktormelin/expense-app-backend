@@ -3,6 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const fetchGroups = asyncHandler(async (req, res) => {
+	console.log(req.user);
 	const myGroups =
 		(await prisma.groups.findMany({
 			where: {
