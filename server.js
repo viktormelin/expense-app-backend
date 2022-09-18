@@ -15,6 +15,7 @@ app.use(cors());
 app.use(errorHandler);
 
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/groups', require('./routes/groupRoutes'));
 
 app.listen(port, () => {
 	console.log(`✅ Server running on port ${port}`);

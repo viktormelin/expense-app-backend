@@ -3,12 +3,11 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const fetchGroups = asyncHandler(async (req, res) => {
-	const { userId } = req.user.id;
 	const myGroups =
 		(await prisma.groups.findMany({
 			where: {
 				members: {
-					has: userId,
+					has: req.user.id,
 				},
 			},
 		})) ?? [];
@@ -18,9 +17,25 @@ const fetchGroups = asyncHandler(async (req, res) => {
 	});
 });
 
+const fetchGroup = asyncHandler(async (req, res) => {
+	const { id } = req.body;
+	const group = await prisma.groups.findFirst({
+		where: { id },
+	});
+
+	if (group) {
+		res.status(200).json({
+			group,
+		});
+	} else {
+		res.status(500);
+		throw new Error('Could not find group');
+	}
+});
+
 const createGroup = asyncHandler(async (req, res) => {
 	const { title, description, users } = req.body;
-	const { userId } = req.user.id;
+	const userId = req.user.id;
 
 	if (!title || !description || !users) {
 		res.status(400);
@@ -59,14 +74,14 @@ const createGroup = asyncHandler(async (req, res) => {
 
 const deleteGroup = asyncHandler(async (req, res) => {
 	const { groupId } = req.body;
-	const { userId } = req.user.id;
+	const userId = req.user.id;
 
 	if (!groupId) {
 		res.status(400);
 		throw new Error('No group id provided');
 	}
 
-	const deleteGroup = await prisma.groups.delete({
+	const deletedGroup = await prisma.groups.delete({
 		where: {
 			AND: [{ id: groupId }, { owner: userId }],
 		},
@@ -89,6 +104,7 @@ const getUserFromEmail = async (email) => {
 
 module.exports = {
 	fetchGroups,
+	fetchGroup,
 	createGroup,
 	deleteGroup,
 };
