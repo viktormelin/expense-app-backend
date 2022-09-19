@@ -77,6 +77,8 @@ const loginUser = asyncHandler(async (req, res) => {
 			firstname: user.firstname,
 			lastname: user.lastname,
 			email: user.email,
+			groups: user.groups,
+			phone: user.phone,
 			token: generateToken(user.id),
 		});
 	} else {
