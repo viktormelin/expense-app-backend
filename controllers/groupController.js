@@ -45,7 +45,7 @@ const createGroup = asyncHandler(async (req, res) => {
 
 	const members = await createMembersArray(userId, users);
 
-	console.log('This should be last', members);
+	console.log('Created members', members);
 
 	const group = await prisma.groups.create({
 		data: {
@@ -107,22 +107,22 @@ const getUserFromEmail = async (email) => {
 
 const createMembersArray = async (userId, users) => {
 	let tempArr = [];
-
 	tempArr.push(userId);
 
 	if (users) {
 		users.forEach(async (email) => {
-			console.log(email);
 			const member = await getUserFromEmail(email);
-			console.log(member);
 			if (member) {
 				tempArr.push(member);
-				console.log(tempArr);
 			}
 		});
 	}
 
-	return tempArr;
+	if (tempArr) {
+		return tempArr;
+	} else {
+		throw new Error('Could not create user list');
+	}
 };
 
 module.exports = {
