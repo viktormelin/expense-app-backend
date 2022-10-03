@@ -24,7 +24,6 @@ model Expenses {
 
 model Groups {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  description String
   expenses    String[] @db.ObjectId
   members     String[] @db.ObjectId
   owner       String   @db.ObjectId
