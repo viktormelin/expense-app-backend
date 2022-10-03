@@ -107,22 +107,27 @@ const getUserFromEmail = async (email) => {
 
 const createMembersArray = async (userId, users) => {
 	let tempArr = [];
-	tempArr.push(userId);
 
 	if (users) {
-		await users.forEach(async (email) => {
+		users.forEach(async (email) => {
 			const member = await getUserFromEmail(email);
 			if (member) {
 				tempArr.push(member);
 			}
 		});
-	}
 
-	if (tempArr) {
+		tempArr.unshift(userId);
 		return tempArr;
 	} else {
-		throw new Error('Could not create user list');
+		tempArr.push(userId);
+		return tempArr;
 	}
+
+	// if (tempArr) {
+	// 	return tempArr;
+	// } else {
+	// 	throw new Error('Could not create user list');
+	// }
 };
 
 module.exports = {
