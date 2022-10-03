@@ -116,8 +116,8 @@ const createMembersArray = async (userId, users) => {
 			const member = await getUserFromEmail(email);
 			console.log(member);
 			if (member) {
-				members.push(member);
-				console.log(members);
+				tempArr.push(member);
+				console.log(tempArr);
 			}
 		});
 	}
