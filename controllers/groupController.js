@@ -43,17 +43,9 @@ const createGroup = asyncHandler(async (req, res) => {
 		throw new Error('Please provide all required fields');
 	}
 
-	let members = [userId];
+	const members = await createMembersArray(userId, users);
 
-	users.forEach(async (email) => {
-		console.log(email);
-		const member = await getUserFromEmail(email);
-		console.log(member);
-		if (member) {
-			members.push(member);
-			console.log(members);
-		}
-	});
+	console.log('This should be last', members);
 
 	const group = await prisma.groups.create({
 		data: {
@@ -63,6 +55,8 @@ const createGroup = asyncHandler(async (req, res) => {
 			expenses: [],
 		},
 	});
+
+	console.log('Created group', group);
 
 	if (group) {
 		res.status(201).json({
@@ -109,6 +103,26 @@ const getUserFromEmail = async (email) => {
 	} else {
 		throw new Error('Could not find user');
 	}
+};
+
+const createMembersArray = async (userId, users) => {
+	let tempArr = [];
+
+	tempArr.push(userId);
+
+	if (users) {
+		users.forEach(async (email) => {
+			console.log(email);
+			const member = await getUserFromEmail(email);
+			console.log(member);
+			if (member) {
+				members.push(member);
+				console.log(members);
+			}
+		});
+	}
+
+	return tempArr;
 };
 
 module.exports = {
