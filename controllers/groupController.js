@@ -43,16 +43,13 @@ const createGroup = asyncHandler(async (req, res) => {
 		throw new Error('Please provide all required fields');
 	}
 
-	const members = [userId];
-
-	console.log(users);
+	let members = [userId];
 
 	users.forEach(async (email) => {
 		console.log(email);
 		const member = await getUserFromEmail(email);
 		if (member) {
-			const tempObj = { member, joined: false };
-			members.push(tempObj);
+			members.push(member);
 		}
 	});
 
@@ -99,14 +96,11 @@ const deleteGroup = asyncHandler(async (req, res) => {
 });
 
 const getUserFromEmail = async (email) => {
-	console.log('getUserFromEmail', email);
 	const user = await prisma.user.findFirst({
 		where: {
 			email,
 		},
 	});
-
-	console.log('getUserFromEmail', user);
 
 	if (user) {
 		return user.id;
