@@ -13,8 +13,40 @@ const fetchGroups = asyncHandler(async (req, res) => {
 			},
 		})) ?? [];
 
+	if (myGroups.length > 0) {
+		let tempGroups = [];
+
+		for (const group of myGroups) {
+			let tempObject = {
+				id: group.id,
+				expenses: group.expenses,
+				members: [],
+				owner: group.owner,
+				title: group.title,
+			};
+
+			for (const id of group.members) {
+				const populatedMember = await prisma.user.findFirst({
+					where: {
+						id,
+					},
+				});
+
+				tempObject.members.push({
+					id: populatedMember.id,
+					email: populatedMember.email,
+					firstname: populatedMember.firstname,
+					lastname: populatedMember.lastname,
+					phone: populatedMember.phone,
+				});
+			}
+
+			tempGroups.push(tempObject);
+		}
+	}
+
 	res.status(200).json({
-		myGroups,
+		tempGroups,
 	});
 });
 
