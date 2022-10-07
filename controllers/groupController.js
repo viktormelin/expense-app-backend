@@ -13,7 +13,7 @@ const fetchGroups = asyncHandler(async (req, res) => {
 			},
 		})) ?? [];
 
-	let tempGroups = [];
+	let data = [];
 
 	if (myGroups.length > 0) {
 		for (const group of myGroups) {
@@ -43,12 +43,12 @@ const fetchGroups = asyncHandler(async (req, res) => {
 				}
 			}
 
-			tempGroups.push(tempObject);
+			data.push(tempObject);
 		}
 	}
 
 	res.status(200).json({
-		tempGroups,
+		data,
 	});
 });
 
