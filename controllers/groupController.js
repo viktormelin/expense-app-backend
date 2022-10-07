@@ -13,9 +13,9 @@ const fetchGroups = asyncHandler(async (req, res) => {
 			},
 		})) ?? [];
 
-	if (myGroups.length > 0) {
-		let tempGroups = [];
+	let tempGroups = [];
 
+	if (myGroups.length > 0) {
 		for (const group of myGroups) {
 			let tempObject = {
 				id: group.id,
@@ -32,13 +32,15 @@ const fetchGroups = asyncHandler(async (req, res) => {
 					},
 				});
 
-				tempObject.members.push({
-					id: populatedMember.id,
-					email: populatedMember.email,
-					firstname: populatedMember.firstname,
-					lastname: populatedMember.lastname,
-					phone: populatedMember.phone,
-				});
+				if (populatedMember) {
+					tempObject.members.push({
+						id: populatedMember.id,
+						email: populatedMember.email,
+						firstname: populatedMember.firstname,
+						lastname: populatedMember.lastname,
+						phone: populatedMember.phone,
+					});
+				}
 			}
 
 			tempGroups.push(tempObject);
