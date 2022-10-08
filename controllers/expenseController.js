@@ -35,8 +35,9 @@ const createExpense = asyncHandler(async (req, res) => {
 		throw new Error('Please provide all required fields');
 	}
 
+	let tempUsers = [];
 	if (users.length > 0) {
-		users = users.map((user) => {
+		tempUsers = users.map((user) => {
 			user.amount = user.amount + 0.0;
 		});
 	}
@@ -47,7 +48,7 @@ const createExpense = asyncHandler(async (req, res) => {
 			group: groupId,
 			owner: userId,
 			amount: amount + 0.0,
-			users,
+			tempUsers,
 		},
 	});
 
