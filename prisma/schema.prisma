@@ -15,7 +15,6 @@ type ExpensesUsers {
 model Expenses {
   id          String          @id @default(auto()) @map("_id") @db.ObjectId
   amount      Float
-  description String
   group       String          @db.ObjectId
   owner       String          @db.ObjectId
   title       String
