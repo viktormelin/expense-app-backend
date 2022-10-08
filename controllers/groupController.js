@@ -30,7 +30,7 @@ const fetchGroups = asyncHandler(async (req, res) => {
 	}
 
 	return res.status(200).json({
-		...data,
+		data,
 	});
 });
 
@@ -89,7 +89,7 @@ const fetchGroup = asyncHandler(async (req, res) => {
 		}
 
 		return res.status(200).json({
-			...data,
+			data,
 		});
 	} else {
 		res.status(500);
@@ -119,7 +119,7 @@ const createGroup = asyncHandler(async (req, res) => {
 
 	if (group) {
 		return res.status(201).json({
-			...group,
+			group,
 		});
 	} else {
 		res.status(500);
