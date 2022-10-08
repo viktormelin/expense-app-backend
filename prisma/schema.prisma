@@ -8,7 +8,7 @@ datasource db {
 }
 
 type ExpensesUsers {
-  amount String
+  amount Float
   user   String @db.ObjectId
 }
 
