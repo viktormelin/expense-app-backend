@@ -29,8 +29,8 @@ const fetchGroups = asyncHandler(async (req, res) => {
 		}
 	}
 
-	res.status(200).json({
-		data,
+	return res.status(200).json({
+		...data,
 	});
 });
 
@@ -88,8 +88,8 @@ const fetchGroup = asyncHandler(async (req, res) => {
 			}
 		}
 
-		res.status(200).json({
-			data,
+		return res.status(200).json({
+			...data,
 		});
 	} else {
 		res.status(500);
@@ -118,8 +118,8 @@ const createGroup = asyncHandler(async (req, res) => {
 	});
 
 	if (group) {
-		res.status(201).json({
-			group,
+		return res.status(201).json({
+			...group,
 		});
 	} else {
 		res.status(500);
@@ -143,7 +143,7 @@ const deleteGroup = asyncHandler(async (req, res) => {
 	});
 
 	if (deletedGroup) {
-		res.status(201);
+		return res.status(201);
 	} else {
 		res.status(500);
 		throw new Error('Could not delete group');
