@@ -27,10 +27,10 @@ const fetchExpense = asyncHandler(async (req, res) => {
 });
 
 const createExpense = asyncHandler(async (req, res) => {
-	const { title, description, amount, users } = req.body;
-	const { userId } = req.user;
+	const { groupId, title, amount, users } = req.body;
+	const userId = req.user.id;
 
-	if (!title || !description || !amount || !users) {
+	if (!groupId || !title || !amount || !users) {
 		res.status(400);
 		throw new Error('Please provide all required fields');
 	}
@@ -38,13 +38,35 @@ const createExpense = asyncHandler(async (req, res) => {
 	const expense = await prisma.expenses.create({
 		data: {
 			title,
-			description,
 			group: groupId,
 			owner: userId,
 			amount,
 			users,
 		},
 	});
+
+	if (expense) {
+		const group = await prisma.groups.findFirst({
+			where: { id: groupId },
+		});
+
+		group.expenses.push(expense.id);
+
+		const updatedGroup = await prisma.groups.update({
+			where: { id: groupId },
+			data: { expenses: group.expenses },
+		});
+
+		if (updatedGroup) {
+			res.status(200);
+		} else {
+			res.status(500);
+			throw new Error('Could not update group');
+		}
+	} else {
+		res.status(500);
+		throw new Error('Could not find expense');
+	}
 });
 
 const handleExpensePayment = asyncHandler(async (req, res) => {
@@ -76,3 +98,9 @@ const handleExpensePayment = asyncHandler(async (req, res) => {
 		}
 	});
 });
+
+module.exports = {
+	fetchExpense,
+	createExpense,
+	handleExpensePayment,
+};
