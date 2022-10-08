@@ -17,7 +17,7 @@ const fetchExpense = asyncHandler(async (req, res) => {
 	});
 
 	if (expense) {
-		res.status(200).json({
+		return res.status(200).json({
 			expense,
 		});
 	} else {
@@ -35,12 +35,18 @@ const createExpense = asyncHandler(async (req, res) => {
 		throw new Error('Please provide all required fields');
 	}
 
+	if (users.length > 0) {
+		users = users.map((user) => {
+			user.amount = user.amount + 0.0;
+		});
+	}
+
 	const expense = await prisma.expenses.create({
 		data: {
 			title,
 			group: groupId,
 			owner: userId,
-			amount,
+			amount: amount + 0.0,
 			users,
 		},
 	});
@@ -58,7 +64,7 @@ const createExpense = asyncHandler(async (req, res) => {
 		});
 
 		if (updatedGroup) {
-			res.status(200);
+			return res.status(200);
 		} else {
 			res.status(500);
 			throw new Error('Could not update group');
