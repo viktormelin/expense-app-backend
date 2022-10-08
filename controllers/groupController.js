@@ -20,28 +20,10 @@ const fetchGroups = asyncHandler(async (req, res) => {
 			let tempObject = {
 				id: group.id,
 				expenses: group.expenses,
-				members: [],
+				members: group.members,
 				owner: group.owner,
 				title: group.title,
 			};
-
-			for (const id of group.members) {
-				const populatedMember = await prisma.user.findFirst({
-					where: {
-						id,
-					},
-				});
-
-				if (populatedMember) {
-					tempObject.members.push({
-						id: populatedMember.id,
-						email: populatedMember.email,
-						firstname: populatedMember.firstname,
-						lastname: populatedMember.lastname,
-						phone: populatedMember.phone,
-					});
-				}
-			}
 
 			data.push(tempObject);
 		}
@@ -53,14 +35,61 @@ const fetchGroups = asyncHandler(async (req, res) => {
 });
 
 const fetchGroup = asyncHandler(async (req, res) => {
-	const { id } = req.body;
+	const { groupId } = req.body;
 	const group = await prisma.groups.findFirst({
-		where: { id },
+		where: { id: groupId },
 	});
 
 	if (group) {
+		let data = {
+			id: group.id,
+			expenses: [],
+			members: [],
+			owner: group.owner,
+			title: group.title,
+		};
+
+		for (const memberId of group.members) {
+			const populatedMember = await prisma.user.findFirst({
+				where: {
+					id: memberId,
+				},
+			});
+
+			if (populatedMember) {
+				data.members.push({
+					id: populatedMember.id,
+					email: populatedMember.email,
+					firstname: populatedMember.firstname,
+					lastname: populatedMember.lastname,
+					phone: populatedMember.phone,
+				});
+			}
+		}
+
+		if (group.expenses.length > 0) {
+			for (const expenseId of group.expenses) {
+				const populatedExpense = await prisma.expenses.findFirst({
+					where: {
+						id: expenseId,
+					},
+				});
+
+				if (populatedExpense) {
+					data.expenses.push({
+						id: populatedExpense.id,
+						amount: populatedExpense.amount,
+						group: populatedExpense.group,
+						owner: populatedExpense.owner,
+						title: populatedExpense.title,
+						users: populatedExpense.users,
+					});
+				}
+			}
+		}
+
 		res.status(200).json({
-			group,
+			data,
 		});
 	} else {
 		res.status(500);
