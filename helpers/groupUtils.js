@@ -15,6 +15,20 @@ const getUserFromEmail = async (email) => {
 	}
 };
 
+const getUserFromId = async (id) => {
+	const user = await prisma.user.findFirst({
+		where: {
+			id,
+		},
+	});
+
+	if (user) {
+		return user;
+	} else {
+		throw new Error('Could not find user');
+	}
+};
+
 const createMembersArray = async (userId, users) => {
 	let tempArr = [];
 
