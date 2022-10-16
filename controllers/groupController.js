@@ -87,29 +87,32 @@ const fetchGroup = asyncHandler(async (req, res) => {
           },
         });
 
-        //   console.log(populatedExpense);
-        const populatedExpenseOwner = await prisma.user.findFirst({
-          where: {
-            id: populatedExpense.owner,
-          },
-        });
-
-        let populatedExpenseUsers = [];
-
-        for (const user of populatedExpense.users) {
-          const tempUser = await prisma.user.findFirst({
+        let populatedExpenseOwner;
+        if (populatedExpense) {
+          populatedExpenseOwner = await prisma.user.findFirst({
             where: {
-              id: user.user,
+              id: populatedExpense.owner,
             },
           });
-          populatedExpenseUsers.push({
-            id: tempUser.id,
-            email: tempUser.email,
-            firstname: tempUser.firstname,
-            lastname: tempUser.lastname,
-            phone: tempUser.phone,
-            amount: user.amount,
-          });
+        }
+
+        let populatedExpenseUsers = [];
+        if (populatedExpense) {
+          for (const user of populatedExpense.users) {
+            const tempUser = await prisma.user.findFirst({
+              where: {
+                id: user.user,
+              },
+            });
+            populatedExpenseUsers.push({
+              id: tempUser.id,
+              email: tempUser.email,
+              firstname: tempUser.firstname,
+              lastname: tempUser.lastname,
+              phone: tempUser.phone,
+              amount: user.amount,
+            });
+          }
         }
 
         if (populatedExpense) {
