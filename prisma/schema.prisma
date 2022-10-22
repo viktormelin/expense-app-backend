@@ -3,37 +3,37 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-type ExpensesUsers {
-  amount Float
-  user   String @db.ObjectId
-}
+// type ExpensesUsers {
+//   amount Float
+//   user   String @db.ObjectId
+// }
 
 model Expenses {
-  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  id          Int          @id @default(autoincrement()) @map("_id") 
   amount      Float
-  group       String          @db.ObjectId
-  owner       String          @db.ObjectId
+  group       String          
+  owner       String          
   title       String
-  users       ExpensesUsers[]
+  users       Json
 }
 
 model Groups {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  expenses    String[] @db.ObjectId
-  members     String[] @db.ObjectId
-  owner       String   @db.ObjectId
+  id          Int   @id @default(autoincrement()) @map("_id") 
+  expenses    Json
+  members     Json
+  owner       String  
   title       String
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        Int   @id @default(autoincrement()) @map("_id") 
   email     String
   firstname String
-  groups    String[] @db.ObjectId
+  groups    Json
   lastname  String
   password  String
   phone     String
