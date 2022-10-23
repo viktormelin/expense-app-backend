@@ -1,9 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const asyncHandler = require('express-async-handler');
-
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const Users = require('../models/userModel');
 
 const registerUser = asyncHandler(async (req, res) => {
 	const { firstname, lastname, email, phone, password, confirmPassword } =
@@ -26,8 +24,8 @@ const registerUser = asyncHandler(async (req, res) => {
 		throw new Error('Passwords do not match');
 	}
 
-	const userExist = await prisma.user.findFirst({
-		where: { email },
+	const userExist = await Users.findOne({
+		email,
 	});
 
 	if (userExist) {
@@ -38,15 +36,13 @@ const registerUser = asyncHandler(async (req, res) => {
 	const salt = await bcrypt.genSalt(10);
 	const hashedPassword = await bcrypt.hash(password, salt);
 
-	const user = await prisma.user.create({
-		data: {
-			firstname,
-			lastname,
-			email,
-			phone,
-			password: hashedPassword,
-			groups: [],
-		},
+	const user = await Users.create({
+		firstname,
+		lastname,
+		email,
+		phone,
+		password: hashedPassword,
+		groups: [],
 	});
 
 	if (user) {
@@ -67,9 +63,11 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
 	const { email, password } = req.body;
-	const user = await prisma.user.findFirst({
-		where: { email },
+	const user = await Users.findOne({
+		email,
 	});
+
+	console.log(user);
 
 	if (user && (await bcrypt.compare(password, user.password))) {
 		res.status(200).json({

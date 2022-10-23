@@ -1,113 +1,108 @@
-const asyncHandler = require("express-async-handler");
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const asyncHandler = require('express-async-handler');
+const Expenses = require('../models/expenseModel');
+const Groups = require('../models/groupModel');
+const Users = require('../models/userModel');
 
 const fetchExpense = asyncHandler(async (req, res) => {
-  const { expenseId } = req.body;
+	const { expenseId } = req.body;
 
-  if (!expenseId) {
-    res.status(400);
-    throw new Error("No expense id provided");
-  }
+	if (!expenseId) {
+		res.status(400);
+		throw new Error('No expense id provided');
+	}
 
-  const expense = await prisma.expenses.findFirst({
-    where: {
-      id: expenseId,
-    },
-  });
+	const expense = await Expenses.findOne({
+		id: expenseId,
+	});
 
-  if (expense) {
-    return res.status(200).json({
-      expense,
-    });
-  } else {
-    res.status(500);
-    throw new Error("Could not find expense");
-  }
+	if (expense) {
+		return res.status(200).json({
+			expense,
+		});
+	} else {
+		res.status(500);
+		throw new Error('Could not find expense');
+	}
 });
 
 const createExpense = asyncHandler(async (req, res) => {
-  const { groupId, title, amount, users } = req.body;
-  const userId = req.user.id;
+	const { groupId, title, amount, users } = req.body;
+	const userId = req.user.id;
 
-  if (!groupId || !title || !amount || !users) {
-    res.status(400);
-    throw new Error("Please provide all required fields");
-  }
+	if (!groupId || !title || !amount || !users) {
+		res.status(400);
+		throw new Error('Please provide all required fields');
+	}
 
-  let tempUsers = [];
-  if (users.length > 0) {
-    tempUsers = users.map((user) => {
-      user.amount = user.amount + 0.0;
-    });
-  }
+	let tempUsers = [];
+	if (users.length > 0) {
+		tempUsers = users.map((user) => {
+			user.amount = user.amount + 0.0;
+		});
+	}
 
-  const expense = await prisma.expenses.create({
-    data: {
-      title,
-      group: groupId,
-      owner: userId,
-      amount: amount + 0.0,
-      users: tempUsers,
-    },
-  });
+	const expense = await Expenses.create({
+		title,
+		group: groupId,
+		owner: userId,
+		amount: amount + 0.0,
+		users: tempUsers,
+	});
 
-  if (expense) {
-    const group = await prisma.groups.findFirst({
-      where: { id: groupId },
-    });
+	if (expense) {
+		const group = await Groups.findOne({
+			id: groupId,
+		});
 
-    group.expenses.push(expense.id);
+		group.expenses.push(expense.id);
 
-    const updatedGroup = await prisma.groups.update({
-      where: { id: groupId },
-      data: { expenses: group.expenses },
-    });
+		const updatedGroup = await Groups.updateOne({
+			id: groupId,
+			expenses: group.expenses,
+		});
 
-    if (updatedGroup) {
-      return res.status(200);
-    } else {
-      res.status(500);
-      throw new Error("Could not update group");
-    }
-  } else {
-    res.status(500);
-    throw new Error("Could not find expense");
-  }
+		if (updatedGroup) {
+			return res.status(200);
+		} else {
+			res.status(500);
+			throw new Error('Could not update group');
+		}
+	} else {
+		res.status(500);
+		throw new Error('Could not find expense');
+	}
 });
 
 const handleExpensePayment = asyncHandler(async (req, res) => {
-  const { expenseId, amount } = req.body;
-  const { userId } = req.user;
+	const { expenseId, amount } = req.body;
+	const { userId } = req.user;
 
-  if (!expenseId || !amount) {
-    res.status(400);
-    throw new Error("Please provide all required fields");
-  }
+	if (!expenseId || !amount) {
+		res.status(400);
+		throw new Error('Please provide all required fields');
+	}
 
-  const expense = await prisma.expenses.findFirst({
-    where: {
-      id: expenseId,
-    },
-  });
+	const expense = await Expenses.findOne({
+		id: expenseId,
+	});
 
-  expense.users.forEach(async (user) => {
-    if (user.user === userId) {
-      if (amount === user.amount) {
-        print("Hello World");
-      } else {
-        res.status(418);
-        throw new Error("Amount mismatch");
-      }
-    } else {
-      res.status(418);
-      throw new Error("User mismatch");
-    }
-  });
+	expense.users.forEach(async (user) => {
+		if (user.user === userId) {
+			if (amount === user.amount) {
+				print('Hello World');
+			} else {
+				res.status(418);
+				throw new Error('Amount mismatch');
+			}
+		} else {
+			res.status(418);
+			throw new Error('User mismatch');
+		}
+	});
 });
 
 module.exports = {
-  fetchExpense,
-  createExpense,
-  handleExpensePayment,
+	fetchExpense,
+	createExpense,
+	handleExpensePayment,
 };
