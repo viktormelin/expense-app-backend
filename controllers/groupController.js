@@ -3,7 +3,6 @@ const asyncHandler = require("express-async-handler");
 const { createMembersArray } = require("../helpers/groupUtils");
 const Expenses = require("../models/expenseModel");
 const Groups = require("../models/groupModel");
-const Users = require("../models/userModel");
 
 const fetchGroups = asyncHandler(async (req, res) => {
   const myGroups =
