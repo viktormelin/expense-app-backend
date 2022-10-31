@@ -27,9 +27,7 @@ const fetchGroups = asyncHandler(async (req, res) => {
     }
   }
 
-  return res.status(200).json({
-    data,
-  });
+  return res.status(200).json(data);
 });
 
 const fetchGroup = asyncHandler(async (req, res) => {
@@ -39,103 +37,29 @@ const fetchGroup = asyncHandler(async (req, res) => {
   })
     .populate("members")
     .populate("expenses")
+    .populate("owner")
     .exec();
 
-  const groupOwner = await Users.findOne({
-    id: group.owner,
-  });
+  let populatedExpenses = [];
 
-  console.log(group);
+  for (const expense of group.expenses) {
+    const curExpense = await Expenses.findOne({ _id: expense._id })
+      .populate("owner")
+      .populate("users.user")
+      .exec();
 
-  return res.status(200).json(group);
+    populatedExpenses.push(curExpense);
+  }
 
-  // if (group) {
-  // 	let data = {
-  // 		id: group.id,
-  // 		expenses: [],
-  // 		members: [],
-  // 		owner: {
-  // 			id: groupOwner.id,
-  // 			email: groupOwner.email,
-  // 			firstname: groupOwner.firstname,
-  // 			lastname: groupOwner.lastname,
-  // 			phone: groupOwner.phone,
-  // 		},
-  // 		title: group.title,
-  // 	};
+  const data = {
+    _id: group._id,
+    expenses: populatedExpenses,
+    members: group.members,
+    owner: group.owner,
+    title: group.title,
+  };
 
-  // 	for (const memberId of group.members) {
-  // 		const populatedMember = await Users.findOne({
-  // 			id: memberId,
-  // 		});
-
-  // 		if (populatedMember) {
-  // 			data.members.push({
-  // 				id: populatedMember.id,
-  // 				email: populatedMember.email,
-  // 				firstname: populatedMember.firstname,
-  // 				lastname: populatedMember.lastname,
-  // 				phone: populatedMember.phone,
-  // 			});
-  // 		}
-  // 	}
-
-  // 	if (group.expenses.length > 0) {
-  // 		for (const expenseId of group.expenses) {
-  // 			const populatedExpense = await Expenses.findOne({
-  // 				id: expenseId,
-  // 			});
-
-  // 			let populatedExpenseOwner;
-  // 			if (populatedExpense) {
-  // 				populatedExpenseOwner = await Users.findOne({
-  // 					id: populatedExpense.owner,
-  // 				});
-  // 			}
-
-  // 			let populatedExpenseUsers = [];
-  // 			if (populatedExpense) {
-  // 				for (const user of populatedExpense.users) {
-  // 					const tempUser = await Users.findOne({
-  // 						id: user.user,
-  // 					});
-  // 					populatedExpenseUsers.push({
-  // 						id: tempUser.id,
-  // 						email: tempUser.email,
-  // 						firstname: tempUser.firstname,
-  // 						lastname: tempUser.lastname,
-  // 						phone: tempUser.phone,
-  // 						amount: user.amount,
-  // 					});
-  // 				}
-  // 			}
-
-  // 			if (populatedExpense) {
-  // 				data.expenses.push({
-  // 					id: populatedExpense.id,
-  // 					amount: populatedExpense.amount,
-  // 					group: populatedExpense.group,
-  // 					owner: {
-  // 						id: populatedExpenseOwner.id,
-  // 						email: populatedExpenseOwner.email,
-  // 						firstname: populatedExpenseOwner.firstname,
-  // 						lastname: populatedExpenseOwner.lastname,
-  // 						phone: populatedExpenseOwner.phone,
-  // 					},
-  // 					title: populatedExpense.title,
-  // 					users: populatedExpenseUsers,
-  // 				});
-  // 			}
-  // 		}
-  // 	}
-
-  // 	return res.status(200).json({
-  // 		data,
-  // 	});
-  // } else {
-  // 	res.status(500);
-  // 	throw new Error('Could not find group');
-  // }
+  return res.status(200).json(data);
 });
 
 const createGroup = asyncHandler(async (req, res) => {
